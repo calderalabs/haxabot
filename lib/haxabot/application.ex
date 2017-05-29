@@ -5,7 +5,7 @@ defmodule Haxabot.Application do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Slack.Bot, [Haxabot.Server, [], get_slack_token()])
+      worker(Slack.Bot, [Haxabot.Slack, [], get_slack_token()])
     ]
 
     opts = [strategy: :one_for_one, name: Haxabot.Supervisor]

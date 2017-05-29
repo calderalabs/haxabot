@@ -14,8 +14,12 @@ defmodule Haxabot.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    # Specify extra applications you'll use from Erlang/Elixir
-    [mod: {Haxabot.Application, []}, extra_applications: [:logger]]
+    opts = [extra_applications: [:logger]]
+
+    case Mix.env do
+      :test -> opts
+      _ -> Keyword.put(opts, :mod, {Haxabot.Application, []})
+    end
   end
 
   # Dependencies can be Hex packages:

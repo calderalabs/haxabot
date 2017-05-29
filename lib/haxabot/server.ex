@@ -1,42 +1,60 @@
 defmodule Haxabot.Server do
-  use Slack
+  use GenServer
 
   defmodule State do
-    defstruct id: nil, name: nil
+    defstruct parent: nil
   end
 
-  def handle_connect(slack, _state) do
-    IO.puts "Connected as #{slack.me.name}"
-    {:ok, %State{id: slack.me.id, name: slack.me.name}}
+  @available_commands [
+    {~r/^apina/, :apina},
+    {~r//, :catch_all}
+  ]
+  def start_link(parent) do
+    GenServer.start_link(__MODULE__, parent)
   end
 
-  def handle_event(%{type: "message", text: text} = message, slack, state) do
-    cond do
-      Regex.match?(~r/apina/, text) -> send_message(get_apina(), message.channel, slack)
-      Regex.match?(~r/(<@#{state.id}>|#{state.name})/, text) -> send_message("lul", message.channel, slack)
-      true -> :ok
-    end
+  def receive_command(pid, command) do
+    GenServer.call(pid, {:receive_command, command})
+  end
+
+  def init(parent) do
+    {:ok, %State{parent: parent}}
+  end
+
+  def handle_call({:receive_command, command}, _from, state) do
+    result =
+      @available_commands
+      |> Enum.find(fn {regex, _} ->
+        Regex.match?(regex, command.text)
+      end)
+
+    new_state =
+      case result do
+        nil -> state
+        {_regex, atom} ->
+          {:ok, new_state} = apply(__MODULE__, atom, [command, state])
+          new_state
+      end
+
+    {:reply, :ok, new_state}
+  end
+
+  def apina(%{message: message}, state) do
+    send_message(get_apina_random_url(), message.channel, state)
     {:ok, state}
   end
-  def handle_event(message = %{type: "message"}, _slack, state) do
-    IO.puts "Received message #{inspect message}"
+
+  def catch_all(%{message: message}, state) do
+    send_message("I don't know what to do with that", message.channel, state)
     {:ok, state}
   end
-  def handle_event(_, _, state), do: {:ok, state}
 
-  def handle_info({:message, text, channel}, slack, state) do
-    IO.puts "Sending your message, captain!"
-
-    send_message(text, channel, slack)
-
-    {:ok, state}
+  def get_apina_random_url do
+    apina_client = Application.get_env(:haxabot, :apina_client) || Haxabot.ApinaClient
+    apina_client.get_random_url()
   end
-  def handle_info(_, _, state), do: {:ok, state}
 
-  defp get_apina do
-    res = HTTPoison.get!("http://apinaporn.com/random", %{}, hackney: [cookie: ["i_need_it_now=fapfap"]])
-    {"Location", value} = List.keyfind(res.headers, "Location", 0)
-    [[id]] = Regex.scan(~r/\d+/, value)
-    "http://apinaporn.com/#{id}.jpg"
+  defp send_message(text, channel, %{parent: parent}) do
+    send parent, {:message, text, channel}
   end
 end
