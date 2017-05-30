@@ -2,11 +2,13 @@ defmodule Haxabot.Commands.Apina do
   alias Haxabot.Commands.Apina
 
   @available_commands [
-    {~r/bomb (\d+)/, Apina.Bomb},
-    {~r/(.+)/, Apina.Basic}
+    {~r/^bomb (\d+)/, Apina.Bomb},
+    {~r//, Apina.Basic}
   ]
 
-  def run(%{text: text, message: message}, state) do
+  def run(%{text: "apina" <> text, message: message}, state) do
+    text = text |> String.trim
+
     result =
       @available_commands
       |> Enum.reduce_while(:not_found, fn ({regex, mod}, acc) ->
