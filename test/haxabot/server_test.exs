@@ -34,7 +34,7 @@ defmodule Haxabot.ServerTest do
   end
 
   test "it replies with catch all", %{server: pid} do
-    Server.receive_command(pid, %{text: "hello", message: %{channel: "mine"}})
+    Server.receive_command(pid, %{text: "gibberish", message: %{channel: "mine"}})
     assert_receive {:message, "I don't know what to do with that", "mine"}
   end
 
@@ -80,12 +80,22 @@ defmodule Haxabot.ServerTest do
   test "it replies with custom apina", %{server: pid} do
     TestApinaClient.set_state("http://apina.com/1234")
     Server.receive_command(pid, %{text: "apina per @bugant", message: %{channel: "mine"}})
-    assert_receive {:message, "@bugant: http://apina.com/1234", "mine"}
+    assert_receive {:message, "@bugant http://apina.com/1234", "mine"}
   end
 
   test "it recognizes me as a special username", %{server: pid} do
     TestApinaClient.set_state("http://apina.com/1234")
     Server.receive_command(pid, %{text: "apina per me", message: %{user: "1234", channel: "mine"}})
-    assert_receive {:message, "<@1234>: http://apina.com/1234", "mine"}
+    assert_receive {:message, "<@1234> http://apina.com/1234", "mine"}
+  end
+
+  test "it says hi", %{server: pid} do
+    Server.receive_command(pid, %{text: "hello", message: %{user: "1234", channel: "mine"}})
+    assert_receive {:message, "<@1234> hi", "mine"}
+  end
+
+  test "it says pong", %{server: pid} do
+    Server.receive_command(pid, %{text: "ping", message: %{user: "1234", channel: "mine"}})
+    assert_receive {:message, "<@1234> pong", "mine"}
   end
 end

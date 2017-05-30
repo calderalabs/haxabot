@@ -5,7 +5,7 @@ defmodule Haxabot.Commands.Apina.For do
     run(["<@#{user}>"], message, state)
   end
   def run([user], message, state) do
-    "#{user}: #{Haxabot.Commands.Apina.get_random_url()}"
+    "#{user} #{Haxabot.Commands.Apina.get_random_url()}"
     |> send_message(message.channel, state)
     {:ok, state}
   end
