@@ -6,15 +6,23 @@ defmodule Haxabot.ServerTest do
 
   defmodule TestApinaClient do
     def start_link do
-      Agent.start_link(fn -> :empty end, name: __MODULE__)
+      Agent.start_link(fn -> {[], 0} end, name: __MODULE__)
     end
 
     def get_random_url() do
-      Agent.get(__MODULE__, &(&1))
+      Agent.get_and_update(__MODULE__, fn {list, count} ->
+        case Enum.at(list, count) do
+          nil -> {nil, {list, count}}
+          value -> {value, {list, count+1}}
+        end
+      end)
     end
 
+    def set_state(urls) when is_list(urls) do
+      Agent.update(__MODULE__, fn(_) -> {urls, 0} end)
+    end
     def set_state(url) do
-      Agent.update(__MODULE__, fn(_) -> url end)
+      set_state([url])
     end
   end
 
@@ -34,5 +42,38 @@ defmodule Haxabot.ServerTest do
     TestApinaClient.set_state("http://apina.com/1234")
     Server.receive_command(pid, %{text: "apina", message: %{channel: "mine"}})
     assert_receive {:message, "http://apina.com/1234", "mine"}
+  end
+
+  test "it replies with apina followed by any string", %{server: pid} do
+    TestApinaClient.set_state("http://apina.com/1234")
+    Server.receive_command(pid, %{text: "apina", message: %{channel: "mine"}})
+    assert_receive {:message, "http://apina.com/1234", "mine"}
+  end
+
+  test "it replies with apina bomb", %{server: pid} do
+    TestApinaClient.set_state([
+      "http://apina.com/1234",
+      "http://apina.com/1235",
+      "http://apina.com/1236",
+      "http://apina.com/1237"
+    ])
+    Server.receive_command(pid, %{text: "apina bomb 3", message: %{channel: "mine"}})
+    assert_receive {:message, "http://apina.com/1234", "mine"}
+    assert_receive {:message, "http://apina.com/1235", "mine"}
+    assert_receive {:message, "http://apina.com/1236", "mine"}
+  end
+
+  test "it filters out duplicates with apina bomb", %{server: pid} do
+    TestApinaClient.set_state([
+      "http://apina.com/1234",
+      "http://apina.com/1234",
+      "http://apina.com/1234",
+      "http://apina.com/1235",
+      "http://apina.com/1236",
+    ])
+    Server.receive_command(pid, %{text: "apina bomb 3", message: %{channel: "mine"}})
+    assert_receive {:message, "http://apina.com/1234", "mine"}
+    assert_receive {:message, "http://apina.com/1235", "mine"}
+    assert_receive {:message, "http://apina.com/1236", "mine"}
   end
 end
