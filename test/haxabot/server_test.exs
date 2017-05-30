@@ -76,4 +76,10 @@ defmodule Haxabot.ServerTest do
     assert_receive {:message, "http://apina.com/1235", "mine"}
     assert_receive {:message, "http://apina.com/1236", "mine"}
   end
+
+  test "it replies with custom apina", %{server: pid} do
+    TestApinaClient.set_state("http://apina.com/1234")
+    Server.receive_command(pid, %{text: "apina per @bugant", message: %{channel: "mine"}})
+    assert_receive {:message, "@bugant: http://apina.com/1234", "mine"}
+  end
 end

@@ -3,6 +3,7 @@ defmodule Haxabot.Commands.Apina do
 
   @available_commands [
     {~r/^bomb (\d+)/, Apina.Bomb},
+    {~r/^(?:for|per) (@?\w+)/, Apina.For},
     {~r//, Apina.Basic}
   ]
 
