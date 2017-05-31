@@ -4,7 +4,7 @@ defmodule Haxabot.Commands.Apina do
   @available_commands [
     {~r/^bomb (\d+)/, Apina.Bomb},
     {~r/^(?:for|per) (<?@?\w+>?)/, Apina.For},
-    {~r//, Apina.Basic}
+    {~r/.*/, Apina.Basic}
   ]
 
   def run(%{text: "apina" <> text, message: message}, state) do
@@ -15,7 +15,7 @@ defmodule Haxabot.Commands.Apina do
       |> Enum.reduce_while(:not_found, fn ({regex, mod}, acc) ->
         case Regex.scan(regex, text) do
           [] -> {:cont, acc}
-          [[_|matches]] -> {:halt, {mod, matches}}
+          [[_|matches]|_] -> {:halt, {mod, matches}}
         end
       end)
 

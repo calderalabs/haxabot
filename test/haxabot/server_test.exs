@@ -95,6 +95,12 @@ defmodule Haxabot.ServerTest do
     assert_receive {:message, "<@1234> http://apina.com/1234", "mine"}
   end
 
+  test "it still does apina when followed by nonsense", %{server: pid} do
+    TestApinaClient.set_state("http://apina.com/1234")
+    Server.receive_command(pid, %{text: "apina del bongi bongi", message: %{channel: "mine"}})
+    assert_receive {:message, "http://apina.com/1234", "mine"}
+  end
+
   test "it says hi", %{server: pid} do
     Server.receive_command(pid, %{text: "hello", message: %{user: "1234", channel: "mine"}})
     assert_receive {:message, "<@1234> hi", "mine"}
