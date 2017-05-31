@@ -1,6 +1,6 @@
 # Haxabot
 
-**TODO: Add description**
+Better than hackabot.
 
 ## Installation
 
