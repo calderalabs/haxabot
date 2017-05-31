@@ -46,7 +46,7 @@ defmodule Haxabot.ServerTest do
 
   test "it replies with apina followed by any string", %{server: pid} do
     TestApinaClient.set_state("http://apina.com/1234")
-    Server.receive_command(pid, %{text: "apina", message: %{channel: "mine"}})
+    Server.receive_command(pid, %{text: "apina del bongi bongi", message: %{channel: "mine"}})
     assert_receive {:message, "http://apina.com/1234", "mine"}
   end
 
@@ -79,26 +79,14 @@ defmodule Haxabot.ServerTest do
 
   test "it replies with custom apina", %{server: pid} do
     TestApinaClient.set_state("http://apina.com/1234")
-    Server.receive_command(pid, %{text: "apina per @bugant", message: %{channel: "mine"}})
-    assert_receive {:message, "@bugant http://apina.com/1234", "mine"}
-  end
-
-  test "it replies with custom apina even with slack usernames", %{server: pid} do
-    TestApinaClient.set_state("http://apina.com/1234")
-    Server.receive_command(pid, %{text: "apina per <@1234>", message: %{channel: "mine"}})
-    assert_receive {:message, "<@1234> http://apina.com/1234", "mine"}
+    Server.receive_command(pid, %{text: "apina per i fioi", message: %{channel: "mine"}})
+    assert_receive {:message, "i fioi http://apina.com/1234", "mine"}
   end
 
   test "it recognizes me as a special username", %{server: pid} do
     TestApinaClient.set_state("http://apina.com/1234")
     Server.receive_command(pid, %{text: "apina per me", message: %{user: "1234", channel: "mine"}})
     assert_receive {:message, "<@1234> http://apina.com/1234", "mine"}
-  end
-
-  test "it still does apina when followed by nonsense", %{server: pid} do
-    TestApinaClient.set_state("http://apina.com/1234")
-    Server.receive_command(pid, %{text: "apina del bongi bongi", message: %{channel: "mine"}})
-    assert_receive {:message, "http://apina.com/1234", "mine"}
   end
 
   test "it says hi", %{server: pid} do
