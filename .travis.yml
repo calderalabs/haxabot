@@ -12,4 +12,4 @@ after_success:
   - chmod 600 ~/.ssh/travis.pem
   - cat .travis/host >> ~/.ssh/config
   - git remote add production dokku@52.208.173.29:haxabot
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && git push production master
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && git push -f production master
