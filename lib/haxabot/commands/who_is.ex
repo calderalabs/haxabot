@@ -36,16 +36,16 @@ defmodule Haxabot.Commands.WhoIs do
   end
 
   defp fetch_user(name, %{redis_conn: redis_conn}) do
-    {:ok, result} = Redix.command(redis_conn, ["SMEMBERS", key_for(name)])
+    {:ok, result} = Redix.command(redis_conn, ["LRANGE", key_for(name), 0, -1])
 
     case result do
       [] -> :empty
-      _ -> {:ok, Enum.reverse(result)}
+      _ -> {:ok, result}
     end
   end
 
   defp update_user(name, description, %{redis_conn: redis_conn}) do
-    {:ok, _} = Redix.command(redis_conn, ["SADD", key_for(name), description])
+    {:ok, _} = Redix.command(redis_conn, ["RPUSH", key_for(name), description])
   end
 
   defp delete_user(name, %{redis_conn: redis_conn}) do
