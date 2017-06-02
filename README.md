@@ -1,4 +1,4 @@
-# Haxabot
+# Haxabot [![Build Status](https://travis-ci.org/calderalabs/haxabot.svg?branch=master)](https://travis-ci.org/calderalabs/haxabot)
 
 Better than hackabot.
 
