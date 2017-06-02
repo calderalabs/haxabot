@@ -1,6 +1,9 @@
 defmodule Haxabot.Commands.WhoIs do
   import Haxabot.Commands.Helpers
 
+  def run(%{text: "who is " <> name, message: message}, state) do
+    run(%{text: "whois " <> name, message: message}, state)
+  end
   def run(%{text: "whois " <> name, message: %{channel: channel}}, state) do
     message =
       case fetch_user(name, state) do

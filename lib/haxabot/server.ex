@@ -10,8 +10,8 @@ defmodule Haxabot.Server do
   @available_commands [
     {~r/^apina/, Commands.Apina},
     {~r/^(hello|hi|ping)$/, Commands.Greeting},
+    {~r/^(forget|whois|who is)/, Commands.WhoIs},
     {~r/^(\S+) is/, Commands.WhoIs},
-    {~r/^(forget|whois)/, Commands.WhoIs},
     {~r//, Commands.CatchAll}
   ]
   def start_link(parent) do

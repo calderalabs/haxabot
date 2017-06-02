@@ -113,13 +113,13 @@ defmodule Haxabot.ServerTest do
     assert_receive {:message, "gotcha", "mine"}
     Server.receive_command(pid, %{text: "bugant is a pleb", message: %{channel: "mine"}})
     assert_receive {:message, "gotcha", "mine"}
-    Server.receive_command(pid, %{text: "whois bugant", message: %{channel: "mine"}})
+    Server.receive_command(pid, %{text: "who is bugant", message: %{channel: "mine"}})
     assert_receive {:message, "bugant is a rockstar, a king and a pleb", "mine"}
 
     Server.receive_command(pid, %{text: "forget bugant", message: %{channel: "mine"}})
     assert_receive {:message, "done", "mine"}
 
-    Server.receive_command(pid, %{text: "whois bugant", message: %{channel: "mine"}})
+    Server.receive_command(pid, %{text: "who is bugant", message: %{channel: "mine"}})
     assert_receive {:message, "I don't know who bugant is", "mine"}
   end
 end
