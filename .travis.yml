@@ -1,13 +1,15 @@
 language: elixir
+services:
+  - redis-server
 elixir:
-- 1.4
+  - 1.4
 before_install:
-- openssl aes-256-cbc -K $encrypted_f44a9da7684d_key -iv $encrypted_f44a9da7684d_iv
-  -in .travis/travis.pem.enc -out .travis/travis.pem -d
+  - openssl aes-256-cbc -K $encrypted_f44a9da7684d_key -iv $encrypted_f44a9da7684d_iv
+    -in .travis/travis.pem.enc -out .travis/travis.pem -d
 after_success:
-- mkdir -p ~/.ssh
-- cp .travis/travis.pem ~/.ssh
-- chmod 600 ~/.ssh/travis.pem
-- cat .travis/host >> ~/.ssh/config
-- git remote add production dokku@52.208.173.29:haxabot
-- test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && git push production master
+  - mkdir -p ~/.ssh
+  - cp .travis/travis.pem ~/.ssh
+  - chmod 600 ~/.ssh/travis.pem
+  - cat .travis/host >> ~/.ssh/config
+  - git remote add production dokku@52.208.173.29:haxabot
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && git push production master

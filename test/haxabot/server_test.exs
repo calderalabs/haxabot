@@ -98,4 +98,28 @@ defmodule Haxabot.ServerTest do
     Server.receive_command(pid, %{text: "ping", message: %{user: "1234", channel: "mine"}})
     assert_receive {:message, "<@1234> pong", "mine"}
   end
+
+  test "it remembers who users are", %{server: pid} do
+    Server.receive_command(pid, %{text: "forget bugant", message: %{channel: "mine"}})
+    assert_receive {:message, "done", "mine"}
+
+    Server.receive_command(pid, %{text: "bugant is a rockstar", message: %{channel: "mine"}})
+    assert_receive {:message, "gotcha", "mine"}
+
+    Server.receive_command(pid, %{text: "whois bugant", message: %{channel: "mine"}})
+    assert_receive {:message, "bugant is a rockstar", "mine"}
+
+    Server.receive_command(pid, %{text: "bugant is a king", message: %{channel: "mine"}})
+    assert_receive {:message, "gotcha", "mine"}
+    Server.receive_command(pid, %{text: "bugant is a pleb", message: %{channel: "mine"}})
+    assert_receive {:message, "gotcha", "mine"}
+    Server.receive_command(pid, %{text: "whois bugant", message: %{channel: "mine"}})
+    assert_receive {:message, "bugant is a rockstar, a king and a pleb", "mine"}
+
+    Server.receive_command(pid, %{text: "forget bugant", message: %{channel: "mine"}})
+    assert_receive {:message, "done", "mine"}
+
+    Server.receive_command(pid, %{text: "whois bugant", message: %{channel: "mine"}})
+    assert_receive {:message, "I don't know who bugant is", "mine"}
+  end
 end

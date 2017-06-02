@@ -4,12 +4,14 @@ defmodule Haxabot.Server do
   alias Haxabot.Commands
 
   defmodule State do
-    defstruct parent: nil
+    defstruct parent: nil, redis_conn: nil
   end
 
   @available_commands [
     {~r/^apina/, Commands.Apina},
     {~r/^(hello|hi|ping)$/, Commands.Greeting},
+    {~r/^(\S+) is/, Commands.WhoIs},
+    {~r/^(forget|whois)/, Commands.WhoIs},
     {~r//, Commands.CatchAll}
   ]
   def start_link(parent) do
@@ -21,7 +23,7 @@ defmodule Haxabot.Server do
   end
 
   def init(parent) do
-    {:ok, %State{parent: parent}}
+    {:ok, %State{parent: parent, redis_conn: start_redis_conn()}}
   end
 
   def handle_call({:receive_command, command}, _from, state) do
@@ -40,5 +42,11 @@ defmodule Haxabot.Server do
       end
 
     {:reply, :ok, new_state}
+  end
+
+  defp start_redis_conn() do
+    url = System.get_env("REDIS_URL") || "redis://localhost:6379"
+    {:ok, redis_conn} = Redix.start_link(url)
+    redis_conn
   end
 end
