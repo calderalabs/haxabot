@@ -1,3 +1,0 @@
-Host 52.208.173.29
-  StrictHostKeyChecking no
-  IdentityFile ~/.ssh/travis.pem
