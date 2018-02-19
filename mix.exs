@@ -3,8 +3,8 @@ defmodule Haxabot.Mixfile do
 
   def project do
     [app: :haxabot,
-     version: "0.1.0",
-     elixir: "~> 1.4",
+     version: "0.1.1",
+     elixir: "~> 1.6",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
@@ -32,8 +32,8 @@ defmodule Haxabot.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:slack, "~> 0.11.0"},
+    [{:slack, "~> 0.12.0"},
      {:httpoison, "~> 0.11.0"},
-     {:redix, "~> 0.6.0"}]
+     {:redix, "~> 0.7.0"}]
   end
 end
